@@ -1,8 +1,8 @@
 {
-  "name": "booking-subgraph",
+  "name": "promocode-subgraph",
   "version": "1.0.0",
   "private": true,
-  "description": "Booking subgraph: bookings by userId over gRPC booking-service, with ACL",
+  "description": "Promocode subgraph: extends Booking with a re-validated discountPercent/discountInfo, migrated out of booking-subgraph",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@apollo/server": "^4.8.1",
-    "@apollo/subgraph": "^2.4.0",
+    "@apollo/subgraph": "^2.4.1",
     "@grpc/grpc-js": "^1.10.9",
     "@grpc/proto-loader": "^0.7.13",
-    "dataloader": "^2.2.2",
+    "axios": "^1.7.2",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6"
   },

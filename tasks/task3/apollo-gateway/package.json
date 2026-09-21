@@ -1,20 +1,17 @@
 {
-  "name": "hotel-subgraph",
+  "name": "apollo-gateway",
   "version": "1.0.0",
   "private": true,
-  "description": "Hotel subgraph: hotel data from the monolith REST API, batched + cached with DataLoader",
+  "description": "Gateway: aggregates booking/hotel/promocode subgraphs into one supergraph",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@apollo/gateway": "^2.5.2",
     "@apollo/server": "^4.8.1",
-    "@apollo/subgraph": "^2.4.1",
-    "axios": "^1.7.2",
-    "dataloader": "^2.2.2",
-    "graphql": "^16.8.1",
-    "graphql-tag": "^2.12.6"
+    "graphql": "^16.8.1"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",
