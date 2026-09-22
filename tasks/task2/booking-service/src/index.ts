@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { AppDataSource } from "./dataSource";
 import { connectProducer } from "./kafkaProducer";
-import { startGrpcServer } from "./grpcServer";
+import { startGrpcServer, setReady } from "./grpcServer";
 
 async function main(): Promise<void> {
   await AppDataSource.initialize();
@@ -11,6 +11,7 @@ async function main(): Promise<void> {
   console.log("booking-service: kafka producer connected");
 
   startGrpcServer();
+  setReady(true);
 }
 
 main().catch((err) => {
