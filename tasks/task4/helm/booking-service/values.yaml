@@ -3,16 +3,46 @@ replicaCount: 1
 image:
   name: booking-service
   tag: latest
-  pullPolicy: IfNotPresent
+  # "Never" for images loaded locally via `minikube image load` (see README).
+  # Override to IfNotPresent/Always in staging/prod when pulling from a registry.
+  pullPolicy: Never
 
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8080
+  targetPort: 9090
+
+# Additional environment variables for the container, e.g.:
+# env:
+#   - name: PGHOST
+#     value: booking-db
+env: []
+
+# Feature flag: booking-service checks ENABLE_FEATURE_X at runtime.
+ENABLE_FEATURE_X: "false"
 
 resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
 
+# booking-service exposes the standard gRPC Health Checking Protocol:
+#  - "" (empty service name)  -> overall liveness (server is bound and accepting connections)
+#  - "readiness"              -> ready to serve traffic (DB + Kafka connected)
 livenessProbe:
+  grpc:
+    port: 9090
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  failureThreshold: 3
 
 readinessProbe:
-
+  grpc:
+    port: 9090
+    service: readiness
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  failureThreshold: 3
