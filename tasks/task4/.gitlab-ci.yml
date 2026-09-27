@@ -2,6 +2,7 @@ stages:
   - build
   - test
   - deploy
+  - tag
 
 variables:
   IMAGE_TAG: latest
@@ -10,7 +11,7 @@ variables:
 build:
   stage: build
   script:
-    - docker build -t hotelio/$IMAGE_NAME:$IMAGE_TAG ../task2/booking-service/
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG ../task2/booking-service/
 
 test:
   stage: test
@@ -39,7 +40,7 @@ test:
       -e PGUSER=booking -e PGPASSWORD=booking -e PGDATABASE=booking
       -e KAFKA_BROKERS=kafka-$CI_JOB_ID:9092 -e KAFKA_TOPIC=booking-events
       -e GRPC_PORT=9090
-      hotelio/$IMAGE_NAME:$IMAGE_TAG
+      $IMAGE_NAME:$IMAGE_TAG
     - curl -sSL -o grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/latest/download/grpc_health_probe-linux-amd64
     - chmod +x grpc_health_probe
     - for i in $(seq 1 30); do ./grpc_health_probe -addr=localhost:9090 -service=readiness && break; sleep 2; done
@@ -47,3 +48,21 @@ test:
   after_script:
     - docker rm -f booking-service-test postgres-$CI_JOB_ID kafka-$CI_JOB_ID || true
     - docker network rm ci-net-$CI_JOB_ID || true
+
+deploy:
+  stage: deploy
+  script:
+    - command -v minikube >/dev/null || { echo "minikube not found on PATH. Run 'minikube start --driver=docker' first (see README)."; exit 1; }
+    - command -v helm >/dev/null || { echo "helm not found on PATH. Install helm first (see README)."; exit 1; }
+    - minikube status >/dev/null 2>&1 || { echo "minikube is not running. Run 'minikube start --driver=docker' first."; exit 1; }
+    - minikube image load $IMAGE_NAME:$IMAGE_TAG
+    - helm upgrade --install booking-service ./helm/booking-service --set image.tag=$IMAGE_TAG
+    - kubectl get pods -l app=booking-service
+
+tag:
+  stage: tag
+  when: manual
+  script:
+    - TAG_NAME="deploy-$(date +%Y%m%d%H%M%S)"
+    - git tag -a "$TAG_NAME" -m "Deploy booking-service image $IMAGE_NAME:$IMAGE_TAG"
+    - echo "Created git tag $TAG_NAME (local only, not pushed)"
