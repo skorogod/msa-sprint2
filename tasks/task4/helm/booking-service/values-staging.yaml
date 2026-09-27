@@ -6,6 +6,13 @@ image:
   tag: staging
   pullPolicy: IfNotPresent
 
+# External Postgres/Kafka already run in staging — don't deploy the local single-node ones.
+postgres:
+  enabled: false
+
+kafka:
+  enabled: false
+
 env:
   - name: PGHOST
     value: booking-db.staging.svc.cluster.local

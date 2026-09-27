@@ -6,6 +6,12 @@ image:
   tag: stable
   pullPolicy: IfNotPresent
 
+postgres:
+  enabled: false
+
+kafka:
+  enabled: false
+
 env:
   - name: PGHOST
     value: booking-db.prod.svc.cluster.local

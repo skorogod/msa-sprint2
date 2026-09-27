@@ -12,11 +12,33 @@ service:
   port: 80
   targetPort: 9090
 
-# Additional environment variables for the container, e.g.:
-# env:
-#   - name: PGHOST
-#     value: booking-db
-env: []
+postgres:
+  enabled: true
+  user: booking
+  password: booking
+  database: booking
+
+kafka:
+  enabled: true
+
+
+env:
+  - name: PGHOST
+    value: booking-postgres
+  - name: PGPORT
+    value: "5432"
+  - name: PGUSER
+    value: booking
+  - name: PGPASSWORD
+    value: booking
+  - name: PGDATABASE
+    value: booking
+  - name: KAFKA_BROKERS
+    value: booking-kafka:9092
+  - name: KAFKA_TOPIC
+    value: booking-events
+  - name: GRPC_PORT
+    value: "9090"
 
 # Feature flag: booking-service checks ENABLE_FEATURE_X at runtime.
 ENABLE_FEATURE_X: "false"
